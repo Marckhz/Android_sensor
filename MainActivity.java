@@ -14,13 +14,16 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.net.InetAddress;
@@ -37,7 +40,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     private Socket socket;
     private float[] arraySensor = new float[3];
     private String socketOutput;
-
+    private OutputStream outputStream;
 
 
     public MainActivity() {
@@ -56,6 +59,17 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         new Thread(new SocketThread()).start();
 
+        try{
+            PrintWriter output = new PrintWriter(
+                    new BufferedWriter(
+                            new OutputStreamWriter(socket.getOutputStream())),true);
+            output.println(socketOutput);
+
+        }
+        catch (java.io.IOException e4){
+            e4.printStackTrace();
+        }
+
 
 
 
@@ -69,13 +83,14 @@ public class MainActivity extends Activity implements SensorEventListener {
         public void run() {
             try {
                 socket = new Socket("192.168.0.3", 12349);
-                BufferedReader entry = new BufferedReader(
-                        new InputStreamReader(socket.getInputStream())
+                BufferedWriter entry = new BufferedWriter(
+                        new OutputStreamWriter(socket.getOutputStream())
                 );
-                entry.readLine();
+                entry.write(socketOutput);
                 PrintWriter output = new PrintWriter(new BufferedWriter(new
                         OutputStreamWriter(socket.getOutputStream())), true);
                 output.println(socketOutput);
+
 
 
 
@@ -84,6 +99,8 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 
             }
+
+            outputStream
 
         }
 
@@ -117,27 +134,14 @@ public class MainActivity extends Activity implements SensorEventListener {
         arraySensor[1] = event.values[1];
         arraySensor[2] = event.values[2];
 
-        try{
-            socketOutput = event.values.toString();
-
-             PrintWriter output = new PrintWriter(new BufferedWriter(
-                    new OutputStreamWriter(socket.getOutputStream())),true);
-            output.println(socketOutput);
-
-
-        }
-        catch (java.io.IOException e1){
-            e1.printStackTrace();
-
-        }
-
-
-
 
     }
 
 
+
 }
+
+
 
 
 
