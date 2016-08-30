@@ -60,7 +60,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         new Thread(new SocketThread()).start();
 
         try{
-            PrintWriter output = new PrintWriter(
+            PrintWriter output  = new PrintWriter(
                     new BufferedWriter(
                             new OutputStreamWriter(socket.getOutputStream())),true);
             output.println(socketOutput);
@@ -100,7 +100,8 @@ public class MainActivity extends Activity implements SensorEventListener {
 
             }
 
-            outputStream
+
+
 
         }
 
@@ -133,6 +134,16 @@ public class MainActivity extends Activity implements SensorEventListener {
         arraySensor[0] = event.values[0];
         arraySensor[1] = event.values[1];
         arraySensor[2] = event.values[2];
+
+        try{
+            PrintWriter  out= new PrintWriter(new BufferedWriter(
+                    new OutputStreamWriter(socket.getOutputStream())
+            ),true);
+            out.println(arraySensor[0]);
+        }
+        catch (java.io.IOException b){
+            b.printStackTrace();
+        }
 
 
     }
