@@ -7,6 +7,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.DropBoxManager;
+import android.support.annotation.StringDef;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -36,7 +37,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     private Socket socket;
     private float[] arraySensor = new float[3];
     private String socketOutput;
-    private OutputStream ouputStream;
+
 
 
     public MainActivity() {
@@ -56,18 +57,22 @@ public class MainActivity extends Activity implements SensorEventListener {
         new Thread(new SocketThread()).start();
 
 
+
+
+
     }
 
     class SocketThread implements Runnable {
 
         @Override
+
         public void run() {
             try {
                 socket = new Socket("192.168.0.3", 12349);
-
-
-                socketOutput = arraySensor.toString();
-
+                BufferedReader entry = new BufferedReader(
+                        new InputStreamReader(socket.getInputStream())
+                );
+                entry.readLine();
                 PrintWriter output = new PrintWriter(new BufferedWriter(new
                         OutputStreamWriter(socket.getOutputStream())), true);
                 output.println(socketOutput);
@@ -75,6 +80,8 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 
             } catch (java.io.IOException e) {
+                e.printStackTrace();
+
 
             }
 
@@ -110,7 +117,20 @@ public class MainActivity extends Activity implements SensorEventListener {
         arraySensor[1] = event.values[1];
         arraySensor[2] = event.values[2];
 
-        socketOutput = event.values.toString();
+        try{
+            socketOutput = event.values.toString();
+
+             PrintWriter output = new PrintWriter(new BufferedWriter(
+                    new OutputStreamWriter(socket.getOutputStream())),true);
+            output.println(socketOutput);
+
+
+        }
+        catch (java.io.IOException e1){
+            e1.printStackTrace();
+
+        }
+
 
 
 
