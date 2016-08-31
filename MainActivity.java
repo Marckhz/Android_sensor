@@ -10,6 +10,7 @@ import android.os.DropBoxManager;
 import android.support.annotation.StringDef;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -21,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
@@ -59,6 +61,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         new Thread(new SocketThread()).start();
 
+
         try{
             PrintWriter output  = new PrintWriter(
                     new BufferedWriter(
@@ -68,10 +71,8 @@ public class MainActivity extends Activity implements SensorEventListener {
         }
         catch (java.io.IOException e4){
             e4.printStackTrace();
+
         }
-
-
-
 
 
     }
@@ -130,16 +131,20 @@ public class MainActivity extends Activity implements SensorEventListener {
     @Override
     public void onSensorChanged(final SensorEvent event) {
 
-        texto.setText(Float.toString(event.values[0]));
+        texto.setText(Float.toString(event.values[0])); /* cambio Float.toString por String.valueO */
         arraySensor[0] = event.values[0];
         arraySensor[1] = event.values[1];
         arraySensor[2] = event.values[2];
 
-        try{
-            PrintWriter  out= new PrintWriter(new BufferedWriter(
+        try {
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(socket.getInputStream())
+            );
+            reader.readLine();
+            PrintWriter out = new PrintWriter(new BufferedWriter(
                     new OutputStreamWriter(socket.getOutputStream())
-            ),true);
-            out.println(arraySensor[0]);
+            ), true);
+            out.println(event.values[0]);
         }
         catch (java.io.IOException b){
             b.printStackTrace();
